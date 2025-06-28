@@ -63,47 +63,32 @@ def get_stock_chart():
     logger.debug(f"Checking files: {file_paths}")
 
     try:
-        # Load and concatenate data from both files
-        df_list = []
+        # Load and filter data for the specific date from each file
+        df_day = pd.DataFrame()
+        target_date = pd.to_datetime(date).date()
         for file_path in file_paths:
             if os.path.exists(file_path):
-                df = pd.read_csv(file_path)
-                missing_cols = [col for col in ['timestamp', 'open', 'high', 'low', 'close', 'volume'] if col not in df.columns]
-                if missing_cols:
-                    logger.warning(f"File {file_path} missing columns: {missing_cols}")
-                    for col in missing_cols:
-                        df[col] = 0  # Fallback for missing columns
-                df = df[['timestamp', 'open', 'high', 'low', 'close', 'volume']]
-                df['datetime'] = pd.to_datetime(df['timestamp'], utc=True)
-                df['datetime_et'] = df['datetime'].dt.tz_convert('US/Eastern')
-                df.set_index('datetime_et', inplace=True)
-                df_list.append(df)
+                df = pd.read_csv(file_path, usecols=['timestamp', 'open', 'high', 'low', 'close', 'volume'])
+                df['timestamp'] = pd.to_datetime(df['timestamp'])
+                df['date'] = df['timestamp'].dt.date
+                df = df[df['date'] == target_date]  # Filter by date early
+                if not df.empty:
+                    df['datetime_et'] = df['timestamp'].dt.tz_convert('US/Eastern')
+                    df.set_index('datetime_et', inplace=True)
+                    df_day = pd.concat([df_day, df]) if not df_day.empty else df
             else:
                 logger.error(f"Data file not found: {file_path}")
                 return jsonify({'error': f'Data file not found: {file_path}'}), 404
 
-        df = pd.concat(df_list) if df_list else pd.DataFrame()
-        logger.debug(f"Loaded data shape: {df.shape}")
-
-        if df.empty:
-            logger.warning(f"No data found for {ticker}")
-            return jsonify({'error': f'No data available for {ticker}'}), 404
-
-        df_market = df[df.index.map(is_market_hours)].copy()
-        df_market['date'] = df_market.index.date
-
-        # Filter by date
-        target_date = pd.to_datetime(date).date()
-        df_day = df_market[df_market['date'] == target_date]
         if df_day.empty:
             logger.warning(f"No data found for {ticker} on {date}")
             return jsonify({'error': f'No data available for {ticker} on {date}'}), 404
 
-        logger.debug(f"Data for {date} shape: {df_day.shape}")
+        df_market = df_day[df_day.index.map(is_market_hours)].copy()
 
         # Fill missing minutes
         date_range = pd.date_range(start=f"{date} 09:30:00", end=f"{date} 16:00:00", freq='1min', tz='US/Eastern')
-        df_day = df_day.reindex(date_range, method='ffill').reset_index()
+        df_day = df_market.reindex(date_range, method='ffill').reset_index()
         df_day = df_day.rename(columns={'index': 'datetime_et'})
         df_day = df_day.dropna(subset=['open', 'high', 'low', 'close'])
 
@@ -132,7 +117,3 @@ def get_stock_chart():
 
 if __name__ == '__main__':
     app.run(debug=True)
-
-    
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)), debug=False)
