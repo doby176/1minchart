@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Stock Chart</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <style>
+        #stockChart {
+            width: 100%;
+            height: 600px;
+            border: 1px solid #ccc;
+            overflow: hidden;
+            position: relative;
+        }
+        #stockChart .panzoom {
+            width: 100%;
+            height: 100%;
+        }
+        #stockChart img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        .container {
+            margin: 20px;
+        }
+        select, input, button {
+            margin: 5px;
+            padding: 5px;
+            font-size: 16px;
+        }
+    </style>
+    <!-- Panzoom CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/panzoom/9.4.2/panzoom.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <label for="tickerSelect">Select Ticker:</label>
+        <select id="tickerSelect">
+            {% for ticker in tickers %}
+                <option value="{{ ticker }}">{{ ticker }}</option>
+            {% endfor %}
+        </select>
+        <label for="dateInput">Select Date:</label>
+        <input type="date" id="dateInput" value="2015-01-02">
+        <button id="fetchData">Load Chart</button>
+    </div>
+    <div id="stockChart">
+        <div class="panzoom"><img src="" alt="Stock Chart"></div>
+    </div>
+    <script src="/static/script.js"></script>
+</body>
+</html>

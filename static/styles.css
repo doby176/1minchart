@@ -1,0 +1,38 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+}
+
+.form-container {
+    text-align: center;
+    margin: 20px;
+}
+
+button {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+.chart-container {
+    position: relative;
+    width: 90vw; /* 90% of viewport width */
+    max-width: 1200px; /* Max width for large screens */
+    height: 70vh; /* 70% of viewport height */
+    max-height: 600px; /* Max height to prevent overflow */
+    margin: 20px auto;
+    border: 1px solid #ccc; /* Visible border for debugging */
+}
+
+#stockChart {
+    width: 90% !important;
+    height: 90% !important;
+}
