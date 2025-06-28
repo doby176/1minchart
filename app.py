@@ -73,7 +73,8 @@ def get_stock_chart():
                 df['date'] = df['timestamp'].dt.date
                 df = df[df['date'] == target_date]  # Filter by date early
                 if not df.empty:
-                    df['datetime_et'] = df['timestamp'].dt.tz_convert('US/Eastern')
+                    # Localize to UTC before converting to Eastern Time
+                    df['datetime_et'] = df['timestamp'].dt.tz_localize('UTC').dt.tz_convert('US/Eastern')
                     df.set_index('datetime_et', inplace=True)
                     df_day = pd.concat([df_day, df]) if not df_day.empty else df
             else:
