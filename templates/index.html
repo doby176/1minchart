@@ -1,28 +1,65 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Stock Chart Viewer</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <title>Stock Chart</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <style>
+        #stockChart {
+            width: 100%;
+            height: 600px;
+            border: 1px solid #ccc;
+            overflow: hidden;
+            position: relative;
+        }
+        #stockChart .panzoom {
+            width: 100%;
+            height: 100%;
+        }
+        #stockChart img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        .container {
+            margin: 20px;
+        }
+        select, input, button {
+            margin: 5px;
+            padding: 5px;
+            font-size: 16px;
+        }
+    </style>
+    <!-- Panzoom CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/panzoom/9.4.2/panzoom.min.js"></script>
     <!-- Google AdSense Verification Meta Tag -->
     <meta name="google-adsense-account" content="ca-pub-9416785017460416" />
 </head>
 <body>
-    <h1>Stock Chart Viewer</h1>
-    <form method="GET" action="/api/stock/chart">
-        <label for="ticker">Ticker:</label>
-        <select name="ticker" id="ticker">
+    <div class="container">
+        <label for="tickerSelect">Select Ticker:</label>
+        <select id="tickerSelect">
             {% for ticker in tickers %}
                 <option value="{{ ticker }}">{{ ticker }}</option>
             {% endfor %}
         </select>
-        <label for="date">Date:</label>
-        <input type="date" name="date" id="date" value="2015-01-02">
-        <button type="submit">Load Chart</button>
-    </form>
-    <div id="chart-container">
-        <img id="chart-image" src="" alt="Stock Chart">
+        <label for="dateInput">Select Date:</label>
+        <input type="date" id="dateInput" value="2015-01-02">
+        <button id="fetchData">Load Chart</button>
     </div>
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <div id="stockChart">
+        <div class="panzoom"><img src="" alt="Stock Chart"></div>
+    </div>
+    <script src="/static/script.js"></script>
+
+    <!-- Google AdSense Ad Code (Add after verification with your ad slot ID) -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9416785017460416" crossorigin="anonymous"></script>
+    <ins class="adsbygoogle"
+         style="display:block"
+         data-ad-client="ca-pub-9416785017460416"
+         data-ad-slot="YOUR_AD_SLOT_ID"
+         data-ad-format="auto"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
 </body>
 </html>
