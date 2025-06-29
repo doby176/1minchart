@@ -7,6 +7,14 @@
     <meta name="keywords" content="1-minute candle charts, stock charts, finance, trading, interday data, stock analysis, charting tool">
     <meta name="author" content="Doby176">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://onemchart.onrender.com/">
+    <!-- Open Graph Tags for Social Media SEO -->
+    <meta property="og:title" content="1-Minute Candle Charts - Interday Stock Data">
+    <meta property="og:description" content="Analyze interday 1-minute candle charts for stocks with our free charting tool. Ideal for traders and finance enthusiasts.">
+    <meta property="og:image" content="https://onemchart.onrender.com/static/chart-placeholder.jpg">
+    <meta property="og:url" content="https://onemchart.onrender.com/">
+    <meta property="og:type" content="website">
     <link rel="stylesheet" href="/static/styles.css">
     <style>
         body {
@@ -83,6 +91,17 @@
             bottom: 0;
             width: 100%;
         }
+        .internal-link {
+            text-align: center;
+            padding: 10px;
+        }
+        a {
+            color: #3498db;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
     </style>
     <!-- Structured Data for SEO (Dataset Schema) -->
     <script type="application/ld+json">
@@ -101,7 +120,7 @@
             "contentUrl": "https://onemchart.onrender.com/",
             "encodingFormat": "image/png"
         },
-        "temporalCoverage": "2025-01-01/2025-12-31"
+        "temporalCoverage": "2015-01-01/2030-12-31"
     }
     </script>
     <!-- Panzoom CDN -->
@@ -111,7 +130,7 @@
 </head>
 <body>
     <div class="header">INTERDAY 1MIN DATA FOR STOCKS</div>
-    <div class="intro">Welcome to our 1-minute candle chart tool! Analyze interday stock data with high-resolution charts, ideal for day traders and financial enthusiasts. More tickers and features coming soon!</div>
+    <div class="intro">Welcome to our 1-minute candle chart tool! Analyze interday stock data with high-resolution charts, ideal for day traders and financial enthusiasts. More tickers and features coming soon! <a href="https://onemchart.onrender.com/" class="internal-link">Explore more charts here</a>.</div>
     <div class="container">
         <label for="tickerSelect">Select Ticker:</label>
         <select id="tickerSelect">
@@ -120,7 +139,7 @@
             {% endfor %}
         </select>
         <label for="dateInput">Select Date:</label>
-        <input type="date" id="dateInput" value="2025-01-02" min="2025-01-01">
+        <input type="date" id="dateInput" value="2025-01-02" max="2030-12-31">
         <button id="fetchData">Load Chart</button>
     </div>
     <div id="stockChart">
