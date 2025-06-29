@@ -1,15 +1,68 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Stock Chart</title>
+    <title>1-Minute Candle Charts - Interday Stock Data</title>
+    <meta charset="UTF-8">
+    <meta name="description" content="Explore interday 1-minute candle charts for stock analysis. Get real-time financial data and insights with our charting tool. Perfect for traders and investors.">
+    <meta name="keywords" content="1-minute candle charts, stock charts, finance, trading, interday data, stock analysis, charting tool">
+    <meta name="author" content="Doby176">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/static/styles.css">
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+        .header {
+            background-color: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            font-size: 2em;
+            font-weight: bold;
+        }
+        .intro {
+            text-align: center;
+            padding: 20px;
+            font-size: 1.1em;
+            color: #7f8c8d;
+        }
+        .container {
+            margin: 30px auto;
+            max-width: 800px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        select, input, button {
+            margin: 10px;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
         #stockChart {
             width: 100%;
             height: 600px;
-            border: 1px solid #ccc;
+            border: 2px solid #3498db;
             overflow: hidden;
             position: relative;
+            margin-top: 20px;
+            border-radius: 4px;
         }
         #stockChart .panzoom {
             width: 100%;
@@ -20,21 +73,45 @@
             height: 100%;
             object-fit: contain;
         }
-        .container {
-            margin: 20px;
-        }
-        select, input, button {
-            margin: 5px;
-            padding: 5px;
-            font-size: 16px;
+        .footer {
+            text-align: center;
+            padding: 10px;
+            background-color: #2c3e50;
+            color: white;
+            font-size: 0.9em;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
         }
     </style>
+    <!-- Structured Data for SEO (Dataset Schema) -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org/",
+        "@type": "Dataset",
+        "name": "1-Minute Candle Charts Dataset",
+        "description": "A collection of 1-minute interval candle charts for stock market analysis, providing interday financial data.",
+        "keywords": "1-minute candle charts, stock data, finance, trading",
+        "creator": {
+            "@type": "Person",
+            "name": "Doby176"
+        },
+        "distribution": {
+            "@type": "DataDownload",
+            "contentUrl": "https://onemchart.onrender.com/",
+            "encodingFormat": "image/png"
+        },
+        "temporalCoverage": "2025-01-01/2025-12-31"
+    }
+    </script>
     <!-- Panzoom CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/panzoom/9.4.2/panzoom.min.js"></script>
-    <!-- Google AdSense Verification Meta Tag (already verified) -->
+    <!-- Google AdSense Verification Meta Tag -->
     <meta name="google-adsense-account" content="ca-pub-9416785017460416" />
 </head>
 <body>
+    <div class="header">INTERDAY 1MIN DATA FOR STOCKS</div>
+    <div class="intro">Welcome to our 1-minute candle chart tool! Analyze interday stock data with high-resolution charts, ideal for day traders and financial enthusiasts. More tickers and features coming soon!</div>
     <div class="container">
         <label for="tickerSelect">Select Ticker:</label>
         <select id="tickerSelect">
@@ -43,26 +120,21 @@
             {% endfor %}
         </select>
         <label for="dateInput">Select Date:</label>
-        <input type="date" id="dateInput" value="2015-01-02">
+        <input type="date" id="dateInput" value="2025-01-02" min="2025-01-01">
         <button id="fetchData">Load Chart</button>
     </div>
     <div id="stockChart">
-        <div class="panzoom"><img src="" alt="Stock Chart"></div>
+        <div class="panzoom"><img src="" alt="1-Minute Candle Chart"></div>
     </div>
+    <div class="footer">MORE TICKERS COMING SOON</div>
     <script src="/static/script.js"></script>
 
     <!-- Google AdSense Ad Code -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9416785017460416"
-            crossorigin="anonymous"></script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9416785017460416" crossorigin="anonymous"></script>
     <!-- StockChartBanner -->
-    <ins class="adsbygoogle"
-         style="display:block"
-         data-ad-client="ca-pub-9416785017460416"
-         data-ad-slot="5487535867"
-         data-ad-format="auto"
-         data-full-width-responsive="true"></ins>
+    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-9416785017460416" data-ad-slot="5487535867" data-ad-format="auto" data-full-width-responsive="true"></ins>
     <script>
-         (adsbygoogle = window.adsbygoogle || []).push({});
+        (adsbygoogle = window.adsbygoogle || []).push({});
     </script>
 </body>
 </html>
