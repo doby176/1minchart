@@ -16,7 +16,7 @@ limiter = Limiter(app=app, key_func=get_remote_address, default_limits=["5 per 3
 # Set up logging
 logging.basicConfig(
     level=logging.DEBUG,
-    format='%(asctime)s %(levelname)s: %(message)s',
+    format='%(asctime)s %(levelname)s: %(message)s [%(filename)s:%(lineno)d]',
     handlers=[
         logging.FileHandler('app_debug.log'),
         logging.StreamHandler()
@@ -63,17 +63,17 @@ def get_stock_chart():
     logger.debug(f"Checking files: {file_paths}")
 
     try:
-        # Load and filter data for the specific date from each file
         df_day = pd.DataFrame()
         target_date = pd.to_datetime(date).date()
         for file_path in file_paths:
             if os.path.exists(file_path):
-                df = pd.read_csv(file_path, usecols=['timestamp', 'open', 'high', 'low', 'close', 'volume'])
+                df = pd.read_csv(file_path, usecols=['timestamp', 'open', 'high', 'low', 'close', 'volume'],
+                                dtype={'open': float, 'high': float, 'low': float, 'close': float, 'volume': float},
+                                nrows=1000000)  # Limit rows to reduce memory
                 df['timestamp'] = pd.to_datetime(df['timestamp'])
                 df['date'] = df['timestamp'].dt.date
-                df = df[df['date'] == target_date]  # Filter by date early
+                df = df[df['date'] == target_date]
                 if not df.empty:
-                    # Localize to UTC before converting to Eastern Time
                     df['datetime_et'] = df['timestamp'].dt.tz_localize('UTC').dt.tz_convert('US/Eastern')
                     df.set_index('datetime_et', inplace=True)
                     df_day = pd.concat([df_day, df]) if not df_day.empty else df
@@ -87,33 +87,36 @@ def get_stock_chart():
 
         df_market = df_day[df_day.index.map(is_market_hours)].copy()
 
-        # Fill missing minutes
         date_range = pd.date_range(start=f"{date} 09:30:00", end=f"{date} 16:00:00", freq='1min', tz='US/Eastern')
         df_day = df_market.reindex(date_range, method='ffill').reset_index()
         df_day = df_day.rename(columns={'index': 'datetime_et'})
         df_day = df_day.dropna(subset=['open', 'high', 'low', 'close'])
 
-        # Prepare data for mplfinance
+        for column in ['open', 'high', 'low', 'close', 'volume']:
+            df_day[column] = pd.to_numeric(df_day[column], downcast='float')
+
         df_day = df_day[['datetime_et', 'open', 'high', 'low', 'close', 'volume']]
         df_day.columns = ['Date', 'Open', 'High', 'Low', 'Close', 'Volume']
         df_day.set_index('Date', inplace=True)
         df_day.index = pd.to_datetime(df_day.index)
 
-        # Generate chart
         try:
             fig, ax = mpf.plot(df_day, type='candle', style='charles', title=f'{ticker} 1-Minute Candlestick Chart for {date}',
-                              ylabel='Price', xlabel='Time (ET)', returnfig=True, volume=False, figsize=(12, 6))
+                              ylabel='Price', xlabel='Time (ET)', returnfig=True, volume=False, figsize=(8, 4), dpi=80)
             img_buffer = BytesIO()
             fig.savefig(img_buffer, format='png', bbox_inches='tight')
             img_buffer.seek(0)
             logger.debug(f"Chart generated successfully for {ticker} on {date}")
             return send_file(img_buffer, mimetype='image/png', as_attachment=False)
+        except MemoryError as me:
+            logger.error(f"Memory error generating chart: {str(me)}", exc_info=True)
+            return jsonify({'error': 'Server memory limit reached. Try again later or reduce load.'}), 500
         except Exception as e:
-            logger.error(f"Chart generation failed: {str(e)}")
+            logger.error(f"Chart generation failed: {str(e)}", exc_info=True)
             return jsonify({'error': f'Chart generation error: {str(e)}'}), 500
 
     except Exception as e:
-        logger.error(f"Error processing data for {ticker} on {date}: {str(e)}")
+        logger.error(f"Error processing data for {ticker} on {date}: {str(e)}", exc_info=True)
         return jsonify({'error': f'Error reading data: {str(e)}'}), 500
 
 if __name__ == '__main__':
