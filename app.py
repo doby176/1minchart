@@ -11,7 +11,15 @@ from datetime import time, timedelta
 
 # Initialize Flask app
 app = Flask(__name__)
-limiter = Limiter(app=app, key_func=get_remote_address, default_limits=["5 per 30 minutes"])
+
+# Configure Limiter with in-memory storage (default)
+limiter = Limiter(
+    app=app,
+    key_func=get_remote_address,
+    default_limits=["5 per 30 minutes"],
+    storage_uri="memory://",  # Explicitly use in-memory storage
+    strategy="fixed-window"   # Use fixed window to ensure strict 5/30min limit
+)
 
 # Set up logging
 logging.basicConfig(
