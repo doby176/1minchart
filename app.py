@@ -11,7 +11,7 @@ from datetime import time, timedelta
 
 # Initialize Flask app
 app = Flask(__name__)
-limiter = Limiter(app=app, key_func=get_remote_address)
+limiter = Limiter(app=app, key_func=get_remote_address, default_limits=["5 per 30 minutes"])
 
 # Set up logging
 logging.basicConfig(
@@ -47,7 +47,7 @@ def index():
     return render_template('index.html', tickers=TICKER_FILES.keys())
 
 @app.route('/api/stock/chart', methods=['GET'])
-@limiter.limit("5 per day")
+@limiter.limit("5 per 30 minutes", override_defaults=True)
 def get_stock_chart():
     ticker = request.args.get('ticker', 'QQQ').upper()
     date = request.args.get('date', '2015-01-02')

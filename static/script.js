@@ -14,6 +14,10 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchDataButton.addEventListener('click', () => {
         console.log('Load Chart button clicked');
 
+        // Disable the button to prevent multiple clicks
+        fetchDataButton.disabled = true;
+        fetchDataButton.textContent = 'Loading...'; // Show loading state
+
         const ticker = document.getElementById('tickerSelect').value;
         const date = document.getElementById('dateInput').value;
 
@@ -22,7 +26,15 @@ document.addEventListener('DOMContentLoaded', () => {
         fetch(`/api/stock/chart?ticker=${ticker}&date=${date}`)
             .then(response => {
                 console.log('Response status:', response.status);
-                if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        throw new Error('No data available for this date');
+                    } else if (response.status === 429) {
+                        const retryAfter = response.headers.get('Retry-After') || 30; // Default to 30 minutes
+                        throw new Error(`You have reached the limit of attempts. Try again in ${retryAfter} minutes.`);
+                    }
+                    throw new Error(`HTTP error: ${response.status}`);
+                }
                 return response.blob();
             })
             .then(blob => {
@@ -35,10 +47,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Initialize Panzoom after image loads
                 img.onload = () => {
                     panzoom = Panzoom(panzoomElement, {
-                        maxScale: 3, // Limit max zoom to 3x
-                        minScale: 1, // No zoom out below 1x
-                        step: 0.1,   // Smoother zoom increments
-                        contain: 'outside', // Keep image within bounds
+                        maxScale: 3,
+                        minScale: 1,
+                        step: 0.1,
+                        contain: 'outside',
                         cursor: 'zoom-in'
                     });
                     console.log('Chart image loaded with Panzoom');
@@ -46,7 +58,18 @@ document.addEventListener('DOMContentLoaded', () => {
             })
             .catch(error => {
                 console.error('Error fetching chart:', error);
-                alert('Failed to load chart: ' + error.message);
+                if (error.message.includes('No data available')) {
+                    alert('Failed to load chart: No data for this date. Please choose another date (it may be a holiday or weekend).');
+                } else if (error.message.includes('You have reached the limit')) {
+                    alert(error.message);
+                } else {
+                    alert('Failed to load chart: ' + error.message);
+                }
+            })
+            .finally(() => {
+                // Re-enable the button regardless of success or failure
+                fetchDataButton.disabled = false;
+                fetchDataButton.textContent = 'Load Chart';
             });
     });
 });
